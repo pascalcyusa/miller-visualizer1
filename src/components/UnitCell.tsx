@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import { Line } from '@react-three/drei';
+import { Line, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import type { Mesh } from 'three';
+import type { Group } from 'three';
 
 interface UnitCellProps {
   millerIndices: [number, number, number];
@@ -9,7 +9,7 @@ interface UnitCellProps {
 }
 
 export function UnitCell({ millerIndices, isDirection }: UnitCellProps) {
-  const meshRef = useRef<Mesh>(null);
+  const meshRef = useRef<Group>(null);
 
   // Create unit cell edges
   const edges = [
@@ -46,7 +46,7 @@ export function UnitCell({ millerIndices, isDirection }: UnitCellProps) {
       const plane = new THREE.Plane(
         new THREE.Vector3(h, k, l).normalize()
       );
-      
+
       // Generate points on the plane within the unit cell
       const size = 2;
       const segments = 20;
@@ -70,12 +70,12 @@ export function UnitCell({ millerIndices, isDirection }: UnitCellProps) {
       {edges.map((edge, i) => (
         <Line
           key={i}
-          points={edge}
+          points={edge.map(([x, y, z]) => new THREE.Vector3(x, y, z))}
           color="white"
           lineWidth={1}
         />
       ))}
-      
+
       {/* Miller indices visualization */}
       {isDirection ? (
         <Line
@@ -91,6 +91,31 @@ export function UnitCell({ millerIndices, isDirection }: UnitCellProps) {
           </mesh>
         ))
       )}
+
+      {/* Axes labels */}
+      <Text position={[1.2, 0, 0]} fontSize={0.1} color="white">
+        X
+      </Text>
+      <Text position={[0, 1.2, 0]} fontSize={0.1} color="white">
+        Y
+      </Text>
+      <Text position={[0, 0, 1.2]} fontSize={0.1} color="white">
+        Z
+      </Text>
+
+      {/* Coordinate points */}
+      <mesh position={[1, 0, 0]}>
+        <sphereGeometry args={[0.05]} />
+        <meshBasicMaterial color="blue" />
+      </mesh>
+      <mesh position={[0, 1, 0]}>
+        <sphereGeometry args={[0.05]} />
+        <meshBasicMaterial color="blue" />
+      </mesh>
+      <mesh position={[0, 0, 1]}>
+        <sphereGeometry args={[0.05]} />
+        <meshBasicMaterial color="blue" />
+      </mesh>
     </group>
   );
 }
